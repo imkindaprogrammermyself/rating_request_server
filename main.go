@@ -31,6 +31,7 @@ var REQUIRED_ENV = [...]string{"APPLICATION_ID", "SERVER_TYPE", "SERVER_HOST", "
 var EXPECTED = dat.ExpectedValues{}
 
 func main() {
+	log.SetOutput(os.Stdout)
 	env_file := flag.String("env", ".env", ".env file")
 	ev_file := flag.String("ev", "expected.json", "expected.json file")
 	flag.Parse()
@@ -214,9 +215,9 @@ func fetch(playerInfo dat.PlayerInfo, rateLimit *ratelimit.Limiter) dat.PlayerRa
 		}
 	}
 
-	r_dmg := float64(utils.Sum_uint64(a_dmgs)) / utils.Sum_floats64(e_dmgs)
-	r_frg := float64(utils.Sum_int(a_frgs)) / utils.Sum_floats64(e_frgs)
-	r_win := float64(utils.Sum_int(a_wins)) / utils.Sum_floats64(e_wins)
+	r_dmg := float64(utils.Sum(a_dmgs)) / utils.Sum(e_dmgs)
+	r_frg := float64(utils.Sum(a_frgs)) / utils.Sum(e_frgs)
+	r_win := float64(utils.Sum(a_wins)) / utils.Sum(e_wins)
 
 	n_dmg := math.Max(0, (r_dmg-0.4)/(1-0.4))
 	n_frg := math.Max(0, (r_frg-0.1)/(1-0.1))
