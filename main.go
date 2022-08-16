@@ -3,7 +3,10 @@ package main
 import (
 	"encoding/binary"
 	"encoding/json"
+	"flag"
 	"fmt"
+	"github.com/joho/godotenv"
+	"go.uber.org/ratelimit"
 	"log"
 	"math"
 	"net"
@@ -13,10 +16,8 @@ import (
 	"notyourfather/pr_server/utils"
 	"os"
 	"reflect"
+	"strconv"
 	"sync"
-
-	"github.com/joho/godotenv"
-	"go.uber.org/ratelimit"
 )
 
 var REALMS = map[string]string{
@@ -26,12 +27,15 @@ var REALMS = map[string]string{
 	"RU":   "https://api.worldofwarships.ru/wows/ships/stats/",
 }
 
-var REQUIRED_ENV = [...]string{"APPLICATION_ID", "SERVER_TYPE", "SERVER_HOST", "SERVER_PORT"}
+var REQUIRED_ENV = [...]string{"APPLICATION_ID", "SERVER_TYPE", "SERVER_HOST", "SERVER_PORT", "RATE_LIMIT"}
 var EXPECTED = dat.ExpectedValues{}
 
 func main() {
-	rateLimit := ratelimit.New(10, ratelimit.WithoutSlack)
-	err := godotenv.Load()
+	env_file := flag.String("env", ".env", ".env file")
+	ev_file := flag.String("ev", "expected.json", "expected.json file")
+	flag.Parse()
+
+	err := godotenv.Load(*env_file)
 
 	if err != nil {
 		log.Fatalf("Error loading .env file. %s", err.Error())
@@ -44,10 +48,19 @@ func main() {
 		}
 	}
 
-	content, load_err := os.ReadFile("expected.json")
+	rateLimitVal, rtcErr := strconv.Atoi(os.Getenv("RATE_LIMIT"))
+
+	if rtcErr != nil {
+		log.Fatalf("Invalid RATE_LIMIT value. %s\n", rtcErr.Error())
+	}
+
+	log.Printf("Rate limit is set to [%d]", rateLimitVal)
+
+	rateLimit := ratelimit.New(rateLimitVal, ratelimit.WithoutSlack)
+	content, load_err := os.ReadFile(*ev_file)
 
 	if load_err != nil {
-		log.Fatalf("Error! [expected.json] doesn't exists. %s", load_err.Error())
+		log.Fatalf("Error! [%s] doesn't exists. %s", *ev_file, load_err.Error())
 	}
 
 	json_load_err := json.Unmarshal(content, &EXPECTED)
