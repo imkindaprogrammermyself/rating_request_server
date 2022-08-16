@@ -1,28 +1,14 @@
 package utils
 
-func Sum_floats64(values []float64) float64 {
-	var tmp float64
-
-	for _, val := range values {
-		tmp = tmp + val
-	}
-	return tmp
+type Numeric interface {
+	int | int8 | int16 | int32 | int64 | uint | uint8 | uint16 | uint32 | uint64 | float32 | float64
 }
 
-func Sum_uint64(values []uint64) uint64 {
-	var tmp uint64
+func Sum[T Numeric](values []T) T {
+	var tmp T
 
 	for _, val := range values {
-		tmp = tmp + val
-	}
-	return tmp
-}
-
-func Sum_int(values []int) int {
-	var tmp int
-
-	for _, val := range values {
-		tmp = tmp + val
+		tmp += val
 	}
 	return tmp
 }
