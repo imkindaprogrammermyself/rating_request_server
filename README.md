@@ -7,7 +7,7 @@ A server written in `Go` as an Man-In-The-Middle for requesting player statistic
 
 This server is intended to be used by multiple clients under the same rate limit. 
 
-If multiple clients request under the same rate limit, the limit will be exceeded and the API will return an error (`REQUEST_LIMIT_EXCEEDED`). 
+If multiple clients requests under the same rate limit, the limit will be exceeded and the API will return an error (`REQUEST_LIMIT_EXCEEDED`). 
 
 This server will circumvent that since all connected clients will be on the same rate limit.
 
